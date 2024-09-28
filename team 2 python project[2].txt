@@ -1,0 +1,123 @@
+import random
+
+class CricketStatsTracker:
+    def __init__(self):
+        # Initialize an empty list to store player stats
+        self.data = []
+
+    def add_player(self, name, age, team):
+        # Add a new player to the list with initial values for matches, runs, wickets, strike rate, fours, and sixes
+        new_player = {
+            'Name': name,
+            'Age': age,
+            'Team': team,
+            'Matches': 0,
+            'Runs': 0,
+            'Wickets': 0,
+            'Strike Rate': 0.0,  # Initialize strike rate as 0.0
+            'Fours': 0,  # Initialize number of fours
+            'Sixes': 0   # Initialize number of sixes
+        }
+        self.data.append(new_player)
+
+    def update_stats(self, name, runs=0, wickets=0, matches=1):
+        # Find the player in the list and update their stats
+        player = next((p for p in self.data if p['Name'] == name), None)
+        if player:
+            # Update player's stats
+            player['Runs'] += runs
+            player['Wickets'] += wickets
+            player['Matches'] += matches
+
+            # Randomly generate balls faced between 1 and 100
+            balls_faced = random.randint(1, 100)
+
+            # Calculate strike rate as (runs / balls faced) * 100
+            if balls_faced > 0:
+                player['Strike Rate'] = (runs / balls_faced) * 100
+            else:
+                player['Strike Rate'] = 0.0
+
+            # Automatically calculate the number of fours and sixes from the runs
+            player['Fours'], player['Sixes'] = self.calculate_boundaries(runs)
+            
+            print(f"Updated stats for {name}: Runs = {runs}, Wickets = {wickets}, Fours = {player['Fours']}, Sixes = {player['Sixes']}, Balls Faced = {balls_faced}, Strike Rate = {player['Strike Rate']:.2f}")
+        else:
+            print(f"Player {name} not found. Please add the player first.")
+
+    def calculate_boundaries(self, runs):
+        # Automatically calculate the number of fours and sixes from the total runs
+        max_sixes = runs // 6  # Maximum possible sixes (runs divided by 6)
+        max_fours = runs // 4  # Maximum possible fours (runs divided by 4)
+
+        # Randomly assign sixes and fours, ensuring they fit within the total runs
+        sixes = random.randint(0, max_sixes)
+        remaining_runs = runs - (sixes * 6)
+        fours = min(remaining_runs // 4, max_fours)
+
+        return fours, sixes
+
+    def display_stats(self):
+        # Display the current player stats in detailed format
+        if self.data:
+            print("\nCurrent Player Stats:")
+            for player in self.data:
+                total_boundary_runs = (player['Fours'] * 4) + (player['Sixes'] * 6)
+                other_runs = player['Runs'] - total_boundary_runs
+
+                print("\n------------------------------")
+                print(f"Name: {player['Name']}")
+                print(f"Age: {player['Age']}")
+                print(f"Team: {player['Team']}")
+                print(f"Matches Played: {player['Matches']}")
+                print(f"Total Runs Scored: {player['Runs']}")
+                print(f"Total Wickets Taken: {player['Wickets']}")
+                print(f"Fours: {player['Fours']} (Contributing {player['Fours'] * 4} runs)")
+                print(f"Sixes: {player['Sixes']} (Contributing {player['Sixes'] * 6} runs)")
+                print(f"Other Runs (Singles, Twos, etc.): {other_runs}")
+                print(f"Strike Rate: {player['Strike Rate']:.2f}")
+                print("------------------------------")
+        else:
+            print("No player data available.")
+
+def main():
+    tracker = CricketStatsTracker()
+
+    while True:
+        print("\nYouth League Cricket Stats Tracker")
+        print("1. Add Player")
+        print("2. Update Player Stats")
+        print("3. Display Stats")
+        print("4. Exit")
+        
+        choice = input("Select an option (1-4): ")
+
+        if choice == '1':
+            # Add a new player
+            name = input("Enter player's name: ")
+            age = int(input("Enter player's age: "))
+            team = input("Enter player's team: ")
+            tracker.add_player(name, age, team)
+
+        elif choice == '2':
+            # Update a player's match details
+            name = input("Enter player's name to update stats: ")
+            matches = int(input("Enter the number of matches played: "))
+            runs = int(input("Enter runs scored: "))
+            wickets = int(input("Enter wickets taken: "))
+            tracker.update_stats(name, runs, wickets, matches)
+
+        elif choice == '3':
+            # Display current stats
+            tracker.display_stats()
+        
+        elif choice == '4':
+            # Exit the program
+            print("Exiting the program.")
+            break
+
+        else:
+            print("Invalid option. Please try again.")
+
+if __name__ == "__main__":
+    main()
